@@ -7,7 +7,7 @@ function App() {
   const [message, setMessage] = useState("Waiting for Backend...")
 
   useEffect(() => {
-    fetch("http://localhost:5000/")
+    fetch("https://mern-user-app-xxxx.onrender.com/")
       .then((response) => response.text())
       .then((data) => setMessage(data))
       .catch((error) => console.error("Error fetching data:", error));

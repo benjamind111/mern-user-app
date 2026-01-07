@@ -5,7 +5,7 @@ function UserList() {
 
   // Fetch users (READ)
   const fetchUsers = () => {
-    fetch("http://localhost:5000/users")
+    fetch("https://mern-user-app-xxxx.onrender.com/users")
       .then((res) => res.json())
       .then((data) => setUsers(data))
       .catch((err) => console.error("Error fetching users:", err));

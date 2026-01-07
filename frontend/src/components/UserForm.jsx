@@ -19,7 +19,7 @@ function UserForm() {
     e.preventDefault(); // Stop page from refreshing
 
     try {
-      const response = await fetch("http://localhost:5000/add-user", {
+      const response = await fetch("https://mern-user-app-xxxx.onrender.com/add-user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData), // Send data to Backend
