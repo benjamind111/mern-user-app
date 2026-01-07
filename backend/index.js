@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const User = require('./models/User'); // Import the model we just made
+const User = require('./models/user'); // ✅ Matches your actual filename
 
 const app = express();
 
