@@ -1,0 +1,12 @@
+.navbar{
+    width: 100%;
+    height: 60px;
+    background-color: aquamarine;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sub-nav a{
+    padding: 10px;
+}
