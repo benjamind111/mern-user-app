@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const User = require('./models/UserModel'); // ✅ Matches your actual filename
 const authRoute = require('./routes/auth');
-const verify = require('./routes/verifyToken');
+const verify = require('./routes/VerifyToken');
+const upload = require('./cloudinaryConfig');
 
 const app = express();
 
@@ -22,9 +23,10 @@ app.get("/", (req, res) => {
 });
 
 // 2️⃣ CREATE Route (Save data to Database)
-app.post("/add-user",verify, async (req, res) => {
+app.post("/add-user",verify,upload.single('image'), async (req, res) => {
   try {
-    const newUser = new User(req.body); // Create a new User from frontend data
+    const imageUrl = req.file ? req.file.path : null;
+    const newUser = new User({ ...req.body, image: imageUrl }); // Create a new User from frontend data
     await newUser.save(); // Save it to MongoDB
     res.status(201).json({ message: "User Saved Successfully!", user: newUser });
   } catch (error) {
