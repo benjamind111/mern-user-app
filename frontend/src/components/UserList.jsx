@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 function UserList() {
   const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(""); // 👈 Add this line
 
   // Fetch users (READ)
   const fetchUsers = () => {
@@ -57,23 +58,44 @@ function UserList() {
   return (
     <div style={{ marginTop: "30px" }}>
       <h3>📋 Registered Users</h3>
-      <div className="user-grid"> {/* 👈 New Class */}
+
+      {/* 1. PASTE THIS SEARCH BAR HERE 👇 */}
+      <div className="search-container" style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ padding: "10px", width: "300px", fontSize: "16px", borderRadius: "5px", border: "1px solid #ccc" }}
+        />
+      </div>
+
+      <div className="user-grid">
         
-        {users.map((user) => (
-          <div key={user._id} className="user-card"> {/* 👈 New Class */}
-            <p><strong>👤 Name:</strong> {user.name}</p>
-            <p><strong>🎂 Age:</strong> {user.age}</p>
-            <p><strong>📧 Email:</strong> {user.email}</p>
-            <p><strong>🏙️ City:</strong> {user.city}</p>
+        {/* 2. CHANGE THIS MAPPING LOGIC 👇 */}
+        {users
+          .filter((user) => {
+             // If search is empty, show everyone
+             if (searchTerm === "") return true;
+             // Otherwise, check if name or city matches
+             return (
+               user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               (user.city && user.city.toLowerCase().includes(searchTerm.toLowerCase()))
+             );
+          })
+          .map((user) => (
+            <div key={user._id} className="user-card">
+              <p><strong>👤 Name:</strong> {user.name}</p>
+              <p><strong>🎂 Age:</strong> {user.age}</p>
+              <p><strong>📧 Email:</strong> {user.email}</p>
+              <p><strong>🏙️ City:</strong> {user.city}</p>
 
-            
-            <div className="btn-group"> {/* 👈 New Class */}
-              <button onClick={() => handleEdit(user)} className="btn-edit">Edit</button>
-              <button onClick={() => handleDelete(user._id)} className="btn-delete">Delete</button>
+              <div className="btn-group">
+                <button onClick={() => handleEdit(user)} className="btn-edit">Edit</button>
+                <button onClick={() => handleDelete(user._id)} className="btn-delete">Delete</button>
+              </div>
             </div>
-          </div>
         ))}
-
       </div>
     </div>
   );
