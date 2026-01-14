@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const multer = require('multer');
 const User = require('./models/UserModel'); // ✅ Matches your actual filename
 const authRoute = require('./routes/auth');
 const verify = require('./routes/VerifyToken');
@@ -23,7 +24,7 @@ app.get("/", (req, res) => {
 });
 
 // 2️⃣ CREATE Route (Save data to Database)
-app.post("/add-user",verify,upload.single('image'), async (req, res) => {
+app.post("/api/add-user",verify,upload.single('image'), async (req, res) => {
   try {
     const imageUrl = req.file ? req.file.path : null;
     const newUser = new User({ ...req.body, image: imageUrl }); // Create a new User from frontend data

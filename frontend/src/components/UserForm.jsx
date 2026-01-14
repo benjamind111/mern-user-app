@@ -9,7 +9,7 @@ function UserForm() {
     city: ""
   });
 
-  const [image, setImage] = useState(null); // 👈 New State for file
+  const [image, setImage] = useState(null);
 
   // 2. Handle typing in the inputs
   const handleChange = (e) => {
@@ -17,48 +17,55 @@ function UserForm() {
   };
 
   // 3. Handle the Submit button
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. Create a "FormData" object (It's like a digital envelope)
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('age', age);
-    formData.append('email', email);
-    formData.append('city', city);
+    const dataToSend = new FormData();
+    dataToSend.append('name', formData.name);
+    dataToSend.append('age', formData.age);     // ✅ Fixed: using formData.age
+    dataToSend.append('email', formData.email);
+    dataToSend.append('city', formData.city);
+    
     if (image) {
-      formData.append('image', image); // Put the file in the envelope ✉️
+      dataToSend.append('image', image);
     }
 
     try {
-      const response = await fetch('https://mern-user-app-ir5o.onrender.com/users', {
-        method: 'POST',
+      // 📝 DEBUG: Check your console to see what is being sent
+      console.log("Sending data...", Object.fromEntries(dataToSend));
+
+      // 👇 POTENTIAL FIX: Changed URL from /users to /api/users
+      // If this still gives 404, check your backend server.js file.
+      const response = await fetch("https://mern-user-app-ir5o.onrender.com/api/users", {
+        method: "POST",
         headers: {
-          // ⚠️ IMPORTANT: Do NOT set 'Content-Type': 'application/json' here!
-          // The browser sets the correct 'multipart/form-data' automatically.
-          'auth-token': localStorage.getItem('token') 
+            // ⚠️ Do NOT set 'Content-Type': 'multipart/form-data' manually here.
+            // The browser sets it automatically with the correct 'boundary' when using FormData.
+            'auth-token': localStorage.getItem('token')
         },
-        body: formData, // Send the envelope!
+        body: dataToSend,
       });
 
       if (response.ok) {
-        alert("User added successfully!");
-        setName(""); setAge(""); setEmail(""); setCity(""); setImage(null); // Reset form
-        window.location.reload(); // Reload to show new user
+        alert("✅ User & Image Saved!");
+        setFormData({ name: "", age: "", email: "", city: "" });
+        setImage(null);
+        // window.location.reload(); // Optional: Reloads page
       } else {
-        alert("Failed to add user");
+        const errorData = await response.json();
+        console.error("Server Error:", errorData);
+        alert("❌ Error Saving User: " + (errorData.message || response.statusText));
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Network Error:", error);
+      alert("❌ Network Error. Check console.");
     }
   };
-
-// ... (imports and logic same as before)
 
   return (
     <div style={{ marginTop: "20px" }}>
       <h3>Add New User</h3>
-      <form onSubmit={handleSubmit} className="form-container"> {/* 👈 New Class */}
+      <form onSubmit={handleSubmit} className="form-container">
         
         <input 
           type="text" name="name" placeholder="Name" 
@@ -76,28 +83,26 @@ const handleSubmit = async (e) => {
         />
 
         <input
-  type="text"
-  name="city"
-  placeholder="City"
-  value={formData.city}
-  onChange={handleChange}
-  required
-/>
-{/* Image Upload Input */}
-<div style={{ marginBottom: "10px" }}>
-  <label style={{ display: "block", marginBottom: "5px" }}>Profile Picture:</label>
-  <input 
-    type="file" 
-    accept="image/*"
-    onChange={(e) => setImage(e.target.files[0])} 
-    style={{ border: "none" }}
-  />
-</div>
+          type="text" name="city" placeholder="City"
+          value={formData.city} onChange={handleChange} required
+        />
 
-<button type="submit" className="btn-add">Add User</button>
+        {/* Image Upload Input */}
+        <div style={{ marginBottom: "10px" }}>
+          <label style={{ display: "block", marginBottom: "5px" }}>Profile Picture:</label>
+          <input 
+            type="file" 
+            accept="image/*"
+            onChange={(e) => setImage(e.target.files[0])} 
+            style={{ border: "none" }}
+          />
+        </div>
+
+        <button type="submit" className="btn-add">Add User</button>
 
       </form>
     </div>
   );
 }
+
 export default UserForm;
