@@ -2,15 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const multer = require('multer');
-const User = require('./models/UserModel'); // ✅ Matches your actual filename
+const User = require('./models/UserModel'); 
 const authRoute = require('./routes/auth');
 const verify = require('./routes/VerifyToken');
 const upload = require('./cloudinaryConfig');
 
 const app = express();
 
-app.use(express.json()); // Allows us to read JSON data sent from Frontend
+app.use(express.json()); 
 app.use(cors());
 app.use('/api/auth', authRoute);
 
@@ -18,49 +17,52 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected Successfully!"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-// 1️⃣ READ Route (Check if server works)
+// 1️⃣ READ Route (Health Check)
 app.get("/", (req, res) => {
   res.send("Backend API is Running...");
 });
 
-// 2️⃣ CREATE Route (Save data to Database)
-app.post("/api/add-user",verify,upload.single('image'), async (req, res) => {
+// 2️⃣ CREATE Route (Use '/api/users' to match REST standards)
+// ❌ Old: "/api/add-user" -> ✅ New: "/api/users"
+app.post("/api/users", verify, upload.single('image'), async (req, res) => {
   try {
     const imageUrl = req.file ? req.file.path : null;
-    const newUser = new User({ ...req.body, image: imageUrl }); // Create a new User from frontend data
-    await newUser.save(); // Save it to MongoDB
+    const newUser = new User({ ...req.body, image: imageUrl }); 
+    await newUser.save(); 
     res.status(201).json({ message: "User Saved Successfully!", user: newUser });
   } catch (error) {
     res.status(500).json({ error: "Failed to save user" });
   }
 });
 
-// 3️⃣ READ ALL Route (Get data from Database)
-app.get("/users", async (req, res) => {
+// 3️⃣ READ ALL Route (Add '/api' prefix)
+// ❌ Old: "/users" -> ✅ New: "/api/users"
+app.get("/api/users", async (req, res) => {
   try {
-    const users = await User.find(); // Find ALL users in the DB
-    res.json(users); // Send them back to the frontend as JSON
+    const users = await User.find(); 
+    res.json(users); 
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch users" });
   }
 });
 
-// 4️⃣ DELETE Route (Remove a user by ID)
-app.delete("/users/:id",verify, async (req, res) => {
+// 4️⃣ DELETE Route (Add '/api' prefix)
+// ❌ Old: "/users/:id" -> ✅ New: "/api/users/:id"
+app.delete("/api/users/:id", verify, async (req, res) => {
   try {
     const { id } = req.params;
-    await User.findByIdAndDelete(id); // Find the user by ID and remove them
+    await User.findByIdAndDelete(id); 
     res.json({ message: "User deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete user" });
   }
 });
 
-// 5️⃣ UPDATE Route (Edit a user by ID)
-app.put("/users/:id",verify, async (req, res) => {
+// 5️⃣ UPDATE Route (Add '/api' prefix)
+// ❌ Old: "/users/:id" -> ✅ New: "/api/users/:id"
+app.put("/api/users/:id", verify, async (req, res) => {
   try {
     const { id } = req.params;
-    // req.body contains the new name/age/email
     const updatedUser = await User.findByIdAndUpdate(id, req.body, { new: true });
     res.json(updatedUser);
   } catch (error) {
