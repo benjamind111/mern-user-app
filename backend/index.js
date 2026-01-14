@@ -3,11 +3,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const User = require('./models/UserModel'); // ✅ Matches your actual filename
+const authRoute = require('./routes/auth');
 
 const app = express();
 
 app.use(express.json()); // Allows us to read JSON data sent from Frontend
 app.use(cors());
+app.use('/api/auth', authRoute);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected Successfully!"))
