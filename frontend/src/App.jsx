@@ -1,29 +1,32 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react';
+import UserList from './components/UserList';
 import UserForm from './components/UserForm';
-import UserList from './components/UserList'; 
-import './App.css'; // 👈 IMPORT THE CSS FILE
+import Auth from './components/Auth'; // 👈 Import the new component
 
 function App() {
-  const [message, setMessage] = useState("Waiting for Backend...")
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
-  useEffect(() => {
-    fetch("https://mern-user-app-ir5o.onrender.com/")
-      .then((response) => response.text())
-      .then((data) => setMessage(data))
-      .catch((error) => console.error("Error fetching data:", error));
-  }, [])
+  // Function to handle logout
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+  };
 
+  // If there is no token, show the Login Screen
+  if (!token) {
+    return <Auth onLogin={() => setToken(localStorage.getItem("token"))} />;
+  }
+
+  // If logged in, show the App
   return (
-    <div className="app-container"> {/* 👈 ADD THIS CLASS */}
+    <div className="App" style={{ textAlign: "center", padding: "20px" }}>
       <h1>🚀 MERN User Manager</h1>
-      <h2>Backend Status: <span style={{ color: "green", fontWeight: "bold" }}>{message}</span></h2>
+      <button onClick={logout} style={{background: "red", color: "white", padding: "5px 10px", float: "right"}}>Logout</button>
       
-      <hr style={{ margin: "20px 0", opacity: 0.2 }}/>
-      
-      <UserForm /> 
+      <UserForm />
       <UserList />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
