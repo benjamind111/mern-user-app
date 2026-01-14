@@ -87,6 +87,11 @@ function UserList() {
           })
           .map((user) => (
             <div key={user._id} className="user-card">
+              <img 
+            src={user.image} 
+            alt={user.name} 
+            style={{ width: "100%", height: "200px", objectFit: "cover", borderRadius: "10px", marginBottom: "10px" }} 
+          />
               <p><strong>👤 Name:</strong> {user.name}</p>
               <p><strong>🎂 Age:</strong> {user.age}</p>
               <p><strong>📧 Email:</strong> {user.email}</p>
