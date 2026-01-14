@@ -6,7 +6,7 @@ function UserList() {
 
   // Fetch users (READ)
   const fetchUsers = () => {
-    fetch("https://mern-user-app-ir5o.onrender.com/users")
+    fetch("https://mern-user-app-ir5o.onrender.com/api/users")
       .then((res) => res.json())
       .then((data) => setUsers(data))
       .catch((err) => console.error("Error fetching users:", err));
@@ -20,7 +20,7 @@ function UserList() {
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this user?")) {
       try {
-        await fetch(`http://localhost:5000/users/${id}`, { method: "DELETE" });
+        await fetch(`https://mern-user-app-ir5o.onrender.com/api/users/${id}`, { method: "DELETE" });
         setUsers(users.filter((user) => user._id !== id));
       } catch (error) {
         console.error("Error deleting user:", error);
@@ -37,7 +37,7 @@ function UserList() {
     if (!newName || !newAge) return;
 
     try {
-      const response = await fetch(`https://mern-user-app-ir5o.onrender.com/users/${id}`, {
+      const response = await fetch(`https://mern-user-app-ir5o.onrender.com/api/users/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json",
           'auth-token': localStorage.getItem('token')

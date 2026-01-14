@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 function UserForm() {
-  // 1. State to hold the input data
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -10,19 +9,19 @@ function UserForm() {
   });
 
   const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false); // 1. New Loading State
 
-  // 2. Handle typing in the inputs
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 3. Handle the Submit button
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // 2. Start Loading
 
     const dataToSend = new FormData();
     dataToSend.append('name', formData.name);
-    dataToSend.append('age', formData.age);     // ✅ Fixed: using formData.age
+    dataToSend.append('age', formData.age);
     dataToSend.append('email', formData.email);
     dataToSend.append('city', formData.city);
     
@@ -31,16 +30,10 @@ function UserForm() {
     }
 
     try {
-      // 📝 DEBUG: Check your console to see what is being sent
-      console.log("Sending data...", Object.fromEntries(dataToSend));
-
-      // 👇 POTENTIAL FIX: Changed URL from /users to /api/users
-      // If this still gives 404, check your backend server.js file.
+      // Ensure this URL matches your live backend
       const response = await fetch("https://mern-user-app-ir5o.onrender.com/api/users", {
         method: "POST",
         headers: {
-            // ⚠️ Do NOT set 'Content-Type': 'multipart/form-data' manually here.
-            // The browser sets it automatically with the correct 'boundary' when using FormData.
             'auth-token': localStorage.getItem('token')
         },
         body: dataToSend,
@@ -50,15 +43,15 @@ function UserForm() {
         alert("✅ User & Image Saved!");
         setFormData({ name: "", age: "", email: "", city: "" });
         setImage(null);
-        // window.location.reload(); // Optional: Reloads page
+        window.location.reload(); 
       } else {
-        const errorData = await response.json();
-        console.error("Server Error:", errorData);
-        alert("❌ Error Saving User: " + (errorData.message || response.statusText));
+        alert("❌ Error Saving User");
       }
     } catch (error) {
-      console.error("Network Error:", error);
-      alert("❌ Network Error. Check console.");
+      console.error("Error:", error);
+      alert("❌ Network Error");
+    } finally {
+      setLoading(false); // 3. Stop Loading (whether it worked or failed)
     }
   };
 
@@ -87,7 +80,6 @@ function UserForm() {
           value={formData.city} onChange={handleChange} required
         />
 
-        {/* Image Upload Input */}
         <div style={{ marginBottom: "10px" }}>
           <label style={{ display: "block", marginBottom: "5px" }}>Profile Picture:</label>
           <input 
@@ -98,7 +90,10 @@ function UserForm() {
           />
         </div>
 
-        <button type="submit" className="btn-add">Add User</button>
+        {/* 4. Dynamic Button: Changes text and disables click while loading */}
+        <button type="submit" className="btn-add" disabled={loading}>
+          {loading ? "Saving..." : "Add User"}
+        </button>
 
       </form>
     </div>
