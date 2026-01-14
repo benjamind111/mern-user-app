@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const User = require('./models/UserModel'); // ✅ Matches your actual filename
 const authRoute = require('./routes/auth');
+const verify = require('./routes/verifyToken');
 
 const app = express();
 
@@ -21,7 +22,7 @@ app.get("/", (req, res) => {
 });
 
 // 2️⃣ CREATE Route (Save data to Database)
-app.post("/add-user", async (req, res) => {
+app.post("/add-user",verify, async (req, res) => {
   try {
     const newUser = new User(req.body); // Create a new User from frontend data
     await newUser.save(); // Save it to MongoDB
@@ -42,7 +43,7 @@ app.get("/users", async (req, res) => {
 });
 
 // 4️⃣ DELETE Route (Remove a user by ID)
-app.delete("/users/:id", async (req, res) => {
+app.delete("/users/:id",verify, async (req, res) => {
   try {
     const { id } = req.params;
     await User.findByIdAndDelete(id); // Find the user by ID and remove them
@@ -53,7 +54,7 @@ app.delete("/users/:id", async (req, res) => {
 });
 
 // 5️⃣ UPDATE Route (Edit a user by ID)
-app.put("/users/:id", async (req, res) => {
+app.put("/users/:id",verify, async (req, res) => {
   try {
     const { id } = req.params;
     // req.body contains the new name/age/email

@@ -21,7 +21,9 @@ function UserForm() {
     try {
       const response = await fetch("https://mern-user-app-ir5o.onrender.com/add-user", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+        'auth-token': localStorage.getItem('token')
+        },
         body: JSON.stringify(formData), // Send data to Backend
       });
 

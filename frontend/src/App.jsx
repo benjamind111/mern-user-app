@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import UserList from './components/UserList';
 import UserForm from './components/UserForm';
+import './App.css'; // 👈 IMPORT THE CSS FILE
 import Auth from './components/Auth'; // 👈 Import the new component
 
 function App() {
