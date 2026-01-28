@@ -1,32 +1,56 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import UserList from './components/UserList';
 import UserForm from './components/UserForm';
-import './App.css'; // 👈 IMPORT THE CSS FILE
-import Auth from './components/Auth'; // 👈 Import the new component
+import Sidebar from './components/Sidebar';
+import Dashboard from './components/Dashboard';
+import Auth from './components/Auth';
+import { ToastContainer } from './components/Toast';
+import { ThemeProvider } from './context/ThemeContext';
+import { useToast } from './hooks/useToast';
+import './App.css';
 
-function App() {
+function AppContent() {
   const [token, setToken] = useState(localStorage.getItem("token"));
+  const [users, setUsers] = useState([]);
+  const { toasts, showToast, dismissToast } = useToast();
 
-  // Function to handle logout
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
+    showToast("Logged out successfully", "info");
   };
 
-  // If there is no token, show the Login Screen
   if (!token) {
     return <Auth onLogin={() => setToken(localStorage.getItem("token"))} />;
   }
 
-  // If logged in, show the App
   return (
-    <div className="App" style={{ textAlign: "center", padding: "20px" }}>
-      <h1>🚀 MERN User Manager</h1>
-      <button onClick={logout} style={{background: "red", color: "white", padding: "5px 10px", float: "right"}}>Logout</button>
+    <div className="app-layout">
+      <Sidebar onLogout={logout} />
       
-      <UserForm />
-      <UserList />
+      <main className="main-area">
+        <div className="content-wrapper">
+          <Dashboard totalUsers={users.length} />
+          <UserForm 
+            showToast={showToast} 
+            onUserAdded={() => window.location.reload()}
+          />
+          <UserList 
+            showToast={showToast}
+          />
+        </div>
+      </main>
+
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 

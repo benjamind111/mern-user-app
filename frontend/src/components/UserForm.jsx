@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function UserForm() {
+function UserForm({ showToast, onUserAdded }) {
   const [formData, setFormData] = useState({
     name: "",
     age: "",
@@ -9,15 +9,56 @@ function UserForm() {
   });
 
   const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(false); // 1. New Loading State
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: "" });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+
+    if (!formData.age) {
+      newErrors.age = "Age is required";
+    } else if (formData.age < 1 || formData.age > 120) {
+      newErrors.age = "Age must be between 1 and 120";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    if (!formData.city.trim()) {
+      newErrors.city = "City is required";
+    }
+
+    return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // 2. Start Loading
+    
+    const newErrors = validateForm();
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      showToast?.("Please fill all required fields correctly", "error");
+      return;
+    }
+
+    setLoading(true);
 
     const dataToSend = new FormData();
     dataToSend.append('name', formData.name);
@@ -40,59 +81,91 @@ function UserForm() {
       });
 
       if (response.ok) {
-        alert("✅ User & Image Saved!");
+        showToast?.("User & Image Saved Successfully!", "success");
         setFormData({ name: "", age: "", email: "", city: "" });
         setImage(null);
-        window.location.reload(); 
+        setErrors({});
+        onUserAdded?.();
       } else {
-        alert("❌ Error Saving User");
+        showToast?.("Error Saving User", "error");
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("❌ Network Error");
+      showToast?.("Network Error - Please try again", "error");
     } finally {
-      setLoading(false); // 3. Stop Loading (whether it worked or failed)
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ marginTop: "20px" }}>
-      <h3>Add New User</h3>
-      <form onSubmit={handleSubmit} className="form-container">
+    <div className="form-card">
+      <div className="card-header">
+        <h2 className="card-title">➕ Add New User</h2>
+        <p className="card-subtitle">Create a new user profile</p>
+      </div>
+      
+      <form onSubmit={handleSubmit} className="user-form" noValidate>
         
-        <input 
-          type="text" name="name" placeholder="Name" 
-          value={formData.name} onChange={handleChange} required 
-        />
+        <div className="input-group">
+          <input 
+            type="text" 
+            name="name" 
+            placeholder="Name" 
+            value={formData.name} 
+            onChange={handleChange}
+            className={errors.name ? "input-error" : ""}
+          />
+          {errors.name && <span className="error-message">{errors.name}</span>}
+        </div>
         
-        <input 
-          type="number" name="age" placeholder="Age" 
-          value={formData.age} onChange={handleChange} required 
-        />
+        <div className="input-group">
+          <input 
+            type="number" 
+            name="age" 
+            placeholder="Age" 
+            value={formData.age} 
+            onChange={handleChange}
+            className={errors.age ? "input-error" : ""}
+          />
+          {errors.age && <span className="error-message">{errors.age}</span>}
+        </div>
         
-        <input 
-          type="email" name="email" placeholder="Email" 
-          value={formData.email} onChange={handleChange} required 
-        />
+        <div className="input-group">
+          <input 
+            type="email" 
+            name="email" 
+            placeholder="Email" 
+            value={formData.email} 
+            onChange={handleChange}
+            className={errors.email ? "input-error" : ""}
+          />
+          {errors.email && <span className="error-message">{errors.email}</span>}
+        </div>
 
-        <input
-          type="text" name="city" placeholder="City"
-          value={formData.city} onChange={handleChange} required
-        />
+        <div className="input-group">
+          <input
+            type="text" 
+            name="city" 
+            placeholder="City"
+            value={formData.city} 
+            onChange={handleChange}
+            className={errors.city ? "input-error" : ""}
+          />
+          {errors.city && <span className="error-message">{errors.city}</span>}
+        </div>
 
-        <div style={{ marginBottom: "10px" }}>
-          <label style={{ display: "block", marginBottom: "5px" }}>Profile Picture:</label>
+        <div className="file-upload-group">
+          <label className="file-upload-label">📸 Profile Picture</label>
           <input 
             type="file" 
             accept="image/*"
             onChange={(e) => setImage(e.target.files[0])} 
-            style={{ border: "none" }}
+            className="file-upload-input"
           />
         </div>
 
-        {/* 4. Dynamic Button: Changes text and disables click while loading */}
-        <button type="submit" className="btn-add" disabled={loading}>
-          {loading ? "Saving..." : "Add User"}
+        <button type="submit" className="btn-primary" disabled={loading}>
+          {loading ? "⏳ Saving..." : "✨ Add User"}
         </button>
 
       </form>
