@@ -12,7 +12,7 @@ const getRandomStatus = () => {
   return statuses[Math.floor(Math.random() * statuses.length)];
 };
 
-function UserList({ showToast }) {
+function UserList({ showToast, viewMode = 'grid', filterRole = 'all' }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -115,55 +115,127 @@ function UserList({ showToast }) {
         </div>
       </div>
 
-      <div className="user-grid">
-        {loading ? (
-          // Show skeleton cards while loading
-          Array.from({ length: 6 }).map((_, index) => (
-            <SkeletonCard key={index} />
-          ))
-        ) : filteredUsers.length > 0 ? (
-          filteredUsers.map((user) => (
-            <div key={user._id} className="user-profile-card">
-              <div className="card-header-row">
-                <StatusBadge status={user.status} />
-                <DropdownMenu
-                  onView={() => handleView(user)}
-                  onEdit={() => handleEdit(user)}
-                  onDelete={() => handleDelete(user._id)}
-                />
-              </div>
 
-              <div className="avatar-container">
-                <img 
-                  src={user.image} 
-                  alt={user.name} 
-                  className="user-avatar"
-                />
-              </div>
-              
-              <div className="user-info">
-                <h3 className="user-name">{user.name}</h3>
-                <p className="user-detail">
-                  <span className="detail-icon">🎂</span>
-                  {user.age} years old
-                </p>
-                <p className="user-detail">
-                  <span className="detail-icon">📧</span>
-                  {user.email}
-                </p>
-                <p className="user-detail">
-                  <span className="detail-icon">🏙️</span>
-                  {user.city}
-                </p>
-              </div>
+      {/* Conditional Rendering: List View (Table) or Grid View (Cards) */}
+      {viewMode === 'list' ? (
+        // LIST VIEW - RESPONSIVE TABLE
+        <div className="table-container">
+          {loading ? (
+            <div className="table-loading">
+              <div className="spinner"></div>
+              <p>Loading users...</p>
             </div>
-          ))
-        ) : (
-          <div className="no-results">
-            <p>No users found matching "{debouncedSearch}"</p>
-          </div>
-        )}
-      </div>
+          ) : filteredUsers.length > 0 ? (
+            <table className="users-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Age</th>
+                  <th>City</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr key={user._id}>
+                    {/* User Column: Avatar + Name */}
+                    <td>
+                      <div className="table-user-cell">
+                        <img 
+                          src={user.image} 
+                          alt={user.name} 
+                          className="table-avatar"
+                        />
+                        <span className="table-user-name">{user.name}</span>
+                      </div>
+                    </td>
+                    
+                    {/* Age */}
+                    <td className="table-detail">{user.age} years</td>
+                    
+                    {/* City */}
+                    <td className="table-detail">{user.city}</td>
+                    
+                    {/* Email */}
+                    <td className="table-email">{user.email}</td>
+                    
+                    {/* Status Badge */}
+                    <td>
+                      <StatusBadge status={user.status} />
+                    </td>
+                    
+                    {/* Actions */}
+                    <td>
+                      <DropdownMenu
+                        onView={() => handleView(user)}
+                        onEdit={() => handleEdit(user)}
+                        onDelete={() => handleDelete(user._id)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="no-results">
+              <p>No users found matching "{debouncedSearch}"</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        // GRID VIEW - CARDS
+        <div className="user-grid">
+          {loading ? (
+            // Show skeleton cards while loading
+            Array.from({ length: 6 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))
+          ) : filteredUsers.length > 0 ? (
+            filteredUsers.map((user) => (
+              <div key={user._id} className="user-profile-card">
+                <div className="card-header-row">
+                  <StatusBadge status={user.status} />
+                  <DropdownMenu
+                    onView={() => handleView(user)}
+                    onEdit={() => handleEdit(user)}
+                    onDelete={() => handleDelete(user._id)}
+                  />
+                </div>
+
+                <div className="avatar-container">
+                  <img 
+                    src={user.image} 
+                    alt={user.name} 
+                    className="user-avatar"
+                  />
+                </div>
+                
+                <div className="user-info">
+                  <h3 className="user-name">{user.name}</h3>
+                  <p className="user-detail">
+                    <span className="detail-icon">🎂</span>
+                    {user.age} years old
+                  </p>
+                  <p className="user-detail">
+                    <span className="detail-icon">📧</span>
+                    {user.email}
+                  </p>
+                  <p className="user-detail">
+                    <span className="detail-icon">🏙️</span>
+                    {user.city}
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="no-results">
+              <p>No users found matching "{debouncedSearch}"</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* View Profile Modal */}
       {viewingUser && (
