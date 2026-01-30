@@ -13,7 +13,7 @@ const UserProfileModal = ({ user, onClose, onEdit }) => {
   const userAge = user.age || 'N/A';
   const userStatus = user.status || 'Inactive';
   const userId = user._id ? user._id.substring(0, 12) : 'Unknown';
-  const userImage = user.image || 'https://via.placeholder.com/150';
+  const userImage = user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random&color=fff&size=150`;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -33,7 +33,7 @@ const UserProfileModal = ({ user, onClose, onEdit }) => {
             alt={userName} 
             className="profile-avatar"
             onError={(e) => {
-              e.target.src = 'https://via.placeholder.com/150';
+              e.target.src = 'https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff&size=150';
             }}
           />
         </div>

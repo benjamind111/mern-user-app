@@ -227,10 +227,10 @@ const KanbanBoard = ({ showToast }) => {
                             >
                               <div className="kanban-card-avatar">
                                 <img 
-                                  src={user.image || 'https://via.placeholder.com/40'} 
+                                  src={user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random&color=fff`}
                                   alt={user.name}
                                   onError={(e) => {
-                                    e.target.src = 'https://via.placeholder.com/40';
+                                    e.target.src = 'https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff';
                                   }}
                                 />
                               </div>
