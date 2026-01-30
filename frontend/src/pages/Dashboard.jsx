@@ -271,7 +271,7 @@ const Dashboard = ({ showToast }) => {
                     radius={[8, 8, 0, 0]}
                   />
                 </BarChart>
-              </ResponseContainer>
+              </ResponsiveContainer>
             ) : (
               <div className="flex items-center justify-center h-[300px]">
                 <p className="text-slate-500">No city data available</p>
