@@ -3,6 +3,8 @@ import { Search } from "lucide-react";
 import SkeletonCard from "./SkeletonCard";
 import StatusBadge from "./StatusBadge";
 import DropdownMenu from "./DropdownMenu";
+import EditUserModal from "./EditUserModal";
+import UserProfileModal from "./UserProfileModal";
 
 // Generate random status for users
 const getRandomStatus = () => {
@@ -15,6 +17,8 @@ function UserList({ showToast }) {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [editingUser, setEditingUser] = useState(null);
+  const [viewingUser, setViewingUser] = useState(null);
 
   // Debounce search term
   useEffect(() => {
@@ -64,36 +68,22 @@ function UserList({ showToast }) {
     }
   };
 
-  // Handle Edit (UPDATE)
-  const handleEdit = async (user) => {
-    const newName = prompt("Enter new name:", user.name);
-    const newAge = prompt("Enter new age:", user.age);
+  // Handle Edit - Open Modal
+  const handleEdit = (user) => {
+    setEditingUser(user);
+  };
 
-    if (!newName || !newAge) return;
-
-    try {
-      const response = await fetch(`https://mern-user-app-ir5o.onrender.com/api/users/${user._id}`, {
-        method: "PUT",
-        headers: { 
-          "Content-Type": "application/json",
-          'auth-token': localStorage.getItem('token')
-        },
-        body: JSON.stringify({ name: newName, age: newAge }),
-      });
-
-      if (response.ok) {
-        const updatedUser = await response.json();
-        setUsers(users.map((u) => (u._id === user._id ? { ...updatedUser, status: user.status } : u)));
-        showToast?.("User updated successfully", "success");
-      }
-    } catch (error) {
-      console.error("Error updating user:", error);
-      showToast?.("Failed to update user", "error");
-    }
+  // Handle Save from Modal
+  const handleSave = (updatedUser) => {
+    setUsers(users.map((u) => 
+      u._id === updatedUser._id 
+        ? { ...updatedUser, status: u.status } 
+        : u
+    ));
   };
 
   const handleView = (user) => {
-    showToast?.(`Viewing ${user.name}'s profile`, "info");
+    setViewingUser(user);
   };
 
   // Filter users based on debounced search
@@ -174,6 +164,28 @@ function UserList({ showToast }) {
           </div>
         )}
       </div>
+
+      {/* View Profile Modal */}
+      {viewingUser && (
+        <UserProfileModal
+          user={viewingUser}
+          onClose={() => setViewingUser(null)}
+          onEdit={(user) => {
+            setViewingUser(null);
+            setEditingUser(user);
+          }}
+        />
+      )}
+
+      {/* Edit User Modal */}
+      {editingUser && (
+        <EditUserModal
+          user={editingUser}
+          onClose={() => setEditingUser(null)}
+          onSave={handleSave}
+          showToast={showToast}
+        />
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Users, Settings, Sun, Moon, LogOut, Menu, X } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
@@ -7,9 +8,9 @@ const Sidebar = ({ onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { icon: <LayoutDashboard size={20} />, label: 'Dashboard', active: true },
-    { icon: <Users size={20} />, label: 'Users', active: false },
-    { icon: <Settings size={20} />, label: 'Settings', active: false }
+    { icon: <LayoutDashboard size={20} />, label: 'Dashboard', path: '/' },
+    { icon: <Users size={20} />, label: 'Users', path: '/users' },
+    { icon: <Settings size={20} />, label: 'Settings', path: '/settings' }
   ];
 
   return (
@@ -30,13 +31,17 @@ const Sidebar = ({ onLogout }) => {
         {/* Navigation */}
         <nav className="sidebar-nav">
           {navItems.map((item, index) => (
-            <button
+            <NavLink
               key={index}
-              className={`nav-item ${item.active ? 'nav-item-active' : ''}`}
+              to={item.path}
+              className={({ isActive }) => 
+                `nav-item ${isActive ? 'nav-item-active' : ''}`
+              }
+              onClick={() => setIsOpen(false)}
             >
               {item.icon}
               <span>{item.label}</span>
-            </button>
+            </NavLink>
           ))}
         </nav>
 

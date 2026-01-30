@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const User = require('./models/UserModel'); 
 const authRoute = require('./routes/auth');
+const dashboardRoute = require('./routes/dashboard');
+const workflowRoute = require('./routes/workflow');
+const userRoutes = require('./routes/userRoutes');
 const verify = require('./routes/VerifyToken');
 const upload = require('./cloudinaryConfig');
 
@@ -12,6 +15,9 @@ const app = express();
 app.use(express.json()); 
 app.use(cors());
 app.use('/api/auth', authRoute);
+app.use('/api/dashboard', dashboardRoute);
+app.use('/api/workflow', workflowRoute);
+app.use('/api/users', userRoutes);
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected Successfully!"))
@@ -55,6 +61,58 @@ app.delete("/api/users/:id", verify, async (req, res) => {
     res.json({ message: "User deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: "Failed to delete user" });
+  }
+});
+
+// 🎯 UPDATE USER STATUS (For Kanban Board - With auth)
+app.put("/api/users/update-status", verify, async (req, res) => {
+  try {
+    const { userId, status } = req.body;
+
+    // Validate status
+    const validStatuses = ['Pending', 'Active', 'Inactive'];
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Invalid status. Must be: Pending, Active, or Inactive' 
+      });
+    }
+
+    // Validate userId
+    if (!userId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'userId is required' 
+      });
+    }
+
+    // Update user status
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { status },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'User not found' 
+      });
+    }
+
+    res.status(200).json({ 
+      success: true, 
+      user: updatedUser,
+      message: `User status updated to ${status}`
+    });
+
+  } catch (error) {
+    console.error('Update status error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to update user status',
+      details: error.message
+    });
   }
 });
 

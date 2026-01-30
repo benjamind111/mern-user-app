@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import UserList from './components/UserList';
-import UserForm from './components/UserForm';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
+import Users from './pages/Users';
+import Settings from './pages/Settings';
 import Auth from './components/Auth';
 import { ToastContainer } from './components/Toast';
 import { ThemeProvider } from './context/ThemeContext';
@@ -11,7 +12,6 @@ import './App.css';
 
 function AppContent() {
   const [token, setToken] = useState(localStorage.getItem("token"));
-  const [users, setUsers] = useState([]);
   const { toasts, showToast, dismissToast } = useToast();
 
   const logout = () => {
@@ -21,28 +21,36 @@ function AppContent() {
   };
 
   if (!token) {
-    return <Auth onLogin={() => setToken(localStorage.getItem("token"))} />;
+    return (
+      <>
+        <Auth 
+          onLogin={() => setToken(localStorage.getItem("token"))} 
+          showToast={showToast}
+        />
+        <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+      </>
+    );
   }
 
   return (
-    <div className="app-layout">
-      <Sidebar onLogout={logout} />
-      
-      <main className="main-area">
-        <div className="content-wrapper">
-          <Dashboard totalUsers={users.length} />
-          <UserForm 
-            showToast={showToast} 
-            onUserAdded={() => window.location.reload()}
-          />
-          <UserList 
-            showToast={showToast}
-          />
-        </div>
-      </main>
+    <Router>
+      <div className="app-layout">
+        <Sidebar onLogout={logout} />
+        
+        <main className="main-area">
+          <div className="content-wrapper">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/users" element={<Users showToast={showToast} />} />
+              <Route path="/settings" element={<Settings showToast={showToast} />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </div>
+        </main>
 
-      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
-    </div>
+        <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+      </div>
+    </Router>
   );
 }
 
