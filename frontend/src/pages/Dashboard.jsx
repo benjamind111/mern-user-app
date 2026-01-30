@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, CheckCircle, Clock, TrendingUp } from 'lucide-react';
+import { Users, CheckCircle, Clock, TrendingUp, TrendingDown } from 'lucide-react';
 import { 
   PieChart, 
   Pie, 
@@ -12,8 +12,63 @@ import {
   ResponsiveContainer,
   Legend 
 } from 'recharts';
-import { API_URL } from '../config/api';
 
+// ============================================
+// STATSCARD COMPONENT (Inline Definition)
+// ============================================
+const StatsCard = ({ title, value, icon, subtitle, trend, showPulse }) => {
+  return (
+    <div className="bg-[#1e293b] border border-slate-700 rounded-xl shadow-sm p-6 hover:border-slate-600 transition-colors duration-200">
+      <div className="flex items-start justify-between">
+        {/* Left Side - Text Content */}
+        <div className="flex-1">
+          <p className="text-slate-400 text-sm font-medium">{title}</p>
+          <h3 className="text-3xl font-bold text-white mt-2">{value}</h3>
+          {subtitle && (
+            <p className="text-slate-500 text-xs mt-1">{subtitle}</p>
+          )}
+          
+          {/* Trend Indicator */}
+          {trend !== undefined && trend !== null && (
+            <div className={`flex items-center gap-1 mt-3 ${trend >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {trend >= 0 ? (
+                <TrendingUp className="w-4 h-4" />
+              ) : (
+                <TrendingDown className="w-4 h-4" />
+              )}
+              <span className="text-sm font-semibold">
+                {Math.abs(trend)}%
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Right Side - Icon */}
+        <div className="relative">
+          <div className="p-3 bg-slate-700/50 rounded-lg">
+            <div className="text-slate-300">
+              {icon}
+            </div>
+          </div>
+          
+          {/* Pulse Animation */}
+          {showPulse && (
+            <div className="absolute -top-1 -right-1">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// DASHBOARD COMPONENT
+// ============================================
 const Dashboard = ({ showToast }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,7 +86,7 @@ const Dashboard = ({ showToast }) => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/api/users`);
+      const response = await fetch('https://mern-user-app-ir5o.onrender.com/api/users');
       
       if (response.ok) {
         const data = await response.json();
@@ -84,9 +139,13 @@ const Dashboard = ({ showToast }) => {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="chart-tooltip">
-          <p className="tooltip-label">{payload[0].name || payload[0].payload.city}</p>
-          <p className="tooltip-value">{payload[0].value} users</p>
+        <div className="bg-slate-800 border border-slate-700 rounded-lg p-3 shadow-xl">
+          <p className="text-slate-300 text-sm font-medium">
+            {payload[0].name || payload[0].payload.city}
+          </p>
+          <p className="text-white text-lg font-bold mt-1">
+            {payload[0].value} users
+          </p>
         </div>
       );
     }
@@ -96,9 +155,9 @@ const Dashboard = ({ showToast }) => {
   if (loading) {
     return (
       <div className="page-container">
-        <div className="dashboard-loading">
-          <div className="spinner"></div>
-          <p>Loading Dashboard...</p>
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+          <p className="text-slate-400 mt-4">Loading Dashboard...</p>
         </div>
       </div>
     );
@@ -110,61 +169,51 @@ const Dashboard = ({ showToast }) => {
   return (
     <div className="page-container">
       {/* Page Header */}
-      <div className="page-header">
+      <div className="page-header mb-8">
         <div>
-          <h1 className="page-title">Dashboard</h1>
-          <p className="page-subtitle">Overview of your user management system</p>
+          <h1 className="page-title text-3xl font-bold text-white">Dashboard</h1>
+          <p className="page-subtitle text-slate-400 mt-2">Overview of your user management system</p>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="stats-grid">
+      {/* Stats Cards - Using Inline StatsCard Component */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {/* Total Users */}
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(79, 70, 229, 0.1)' }}>
-            <Users size={24} style={{ color: '#4f46e5' }} />
-          </div>
-          <div className="stat-content">
-            <p className="stat-label">Total Users</p>
-            <h3 className="stat-value">{stats.total}</h3>
-            <p className="stat-change">All registered users</p>
-          </div>
-        </div>
+        <StatsCard
+          title="Total Users"
+          value={stats.total}
+          icon={<Users size={24} />}
+          subtitle="All registered users"
+          trend={null}
+        />
 
         {/* Active Users */}
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(16, 185, 129, 0.1)' }}>
-            <CheckCircle size={24} style={{ color: '#10b981' }} />
-          </div>
-          <div className="stat-content">
-            <p className="stat-label">Active Users</p>
-            <h3 className="stat-value">{stats.active}</h3>
-            <p className="stat-change">
-              {stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}% of total
-            </p>
-          </div>
-        </div>
+        <StatsCard
+          title="Active Users"
+          value={stats.active}
+          icon={<CheckCircle size={24} />}
+          subtitle={`${stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}% of total`}
+          trend={stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}
+          showPulse={stats.active > 0}
+        />
 
         {/* Pending Users */}
-        <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'rgba(245, 158, 11, 0.1)' }}>
-            <Clock size={24} style={{ color: '#f59e0b' }} />
-          </div>
-          <div className="stat-content">
-            <p className="stat-label">Pending Users</p>
-            <h3 className="stat-value">{stats.pending}</h3>
-            <p className="stat-change">Awaiting activation</p>
-          </div>
-        </div>
+        <StatsCard
+          title="Pending Users"
+          value={stats.pending}
+          icon={<Clock size={24} />}
+          subtitle="Awaiting activation"
+          trend={null}
+        />
       </div>
 
       {/* Charts Section */}
-      <div className="charts-grid">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Pie Chart - Status Distribution */}
-        <div className="chart-card">
-          <div className="chart-header">
-            <h3 className="chart-title">User Status Distribution</h3>
-            <p className="chart-subtitle">Breakdown by current status</p>
+        <div className="bg-[#1e293b] border border-slate-700 rounded-xl p-6">
+          <div className="mb-6">
+            <h3 className="text-xl font-bold text-white">User Status Distribution</h3>
+            <p className="text-slate-400 text-sm mt-1">Breakdown by current status</p>
           </div>
           <div className="chart-container">
             {statusData.length > 0 ? (
@@ -189,18 +238,18 @@ const Dashboard = ({ showToast }) => {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="chart-empty">
-                <p>No user data available</p>
+              <div className="flex items-center justify-center h-[300px]">
+                <p className="text-slate-500">No user data available</p>
               </div>
             )}
           </div>
         </div>
 
         {/* Bar Chart - Top Cities */}
-        <div className="chart-card">
-          <div className="chart-header">
-            <h3 className="chart-title">Top Cities</h3>
-            <p className="chart-subtitle">Users by location (Top 5)</p>
+        <div className="bg-[#1e293b] border border-slate-700 rounded-xl p-6">
+          <div className="mb-6">
+            <h3 className="text-xl font-bold text-white">Top Cities</h3>
+            <p className="text-slate-400 text-sm mt-1">Users by location (Top 5)</p>
           </div>
           <div className="chart-container">
             {topCities.length > 0 ? (
@@ -222,10 +271,10 @@ const Dashboard = ({ showToast }) => {
                     radius={[8, 8, 0, 0]}
                   />
                 </BarChart>
-              </ResponsiveContainer>
+              </ResponseContainer>
             ) : (
-              <div className="chart-empty">
-                <p>No city data available</p>
+              <div className="flex items-center justify-center h-[300px]">
+                <p className="text-slate-500">No city data available</p>
               </div>
             )}
           </div>
