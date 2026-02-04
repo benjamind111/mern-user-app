@@ -9,15 +9,15 @@ const Users = ({ showToast }) => {
   const [filterRole, setFilterRole] = useState('all'); // 'all', 'admin', 'user'
 
   return (
-    <div className="page-container">
+    <div className="w-full min-w-full pl-6 pt-6 pb-6 space-y-8">
       {/* Page Header */}
-      <div className="page-header">
+      <div className="flex justify-between items-start flex-wrap gap-4">
         <div>
-          <h1 className="page-title">Team Management</h1>
-          <p className="page-subtitle">Manage your team members and permissions</p>
+          <h1 className="text-4xl font-bold text-white mb-2">Team Management</h1>
+          <p className="text-slate-400">Manage your team members and permissions</p>
         </div>
 
-        <div className="page-header-actions">
+        <div className="flex items-center gap-4">
           {/* Filter Dropdown - only show in grid/list view */}
           {viewMode !== 'board' && (
             <div className="filter-dropdown">
@@ -63,15 +63,13 @@ const Users = ({ showToast }) => {
 
       {/* Conditional Rendering based on view mode */}
       {viewMode === 'board' ? (
-        <>
-          <KanbanBoard showToast={showToast} />
-        </>
+        <KanbanBoard showToast={showToast} />
       ) : (
         <>
-          {/* Add User Form */}
+          {/* Add User Form - Full Width */}
           <UserForm showToast={showToast} onUserAdded={() => window.location.reload()} />
 
-          {/* User List with Grid/List View */}
+          {/* User List with Grid/List View - Full Width */}
           <UserList showToast={showToast} viewMode={viewMode} filterRole={filterRole} />
         </>
       )}

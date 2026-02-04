@@ -98,62 +98,66 @@ function UserForm({ showToast, onUserAdded }) {
   };
 
   return (
-    <div className="form-card">
-      <div className="card-header">
-        <h2 className="card-title">➕ Add New User</h2>
-        <p className="card-subtitle">Create a new user profile</p>
+    <div className="w-full min-w-full bg-[#1e293b] p-6 rounded-xl border border-slate-700">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-white mb-2">➕ Add New User</h2>
+        <p className="text-slate-400 text-sm">Create a new user profile</p>
       </div>
       
-      <form onSubmit={handleSubmit} className="user-form" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         
-        <div className="input-group">
-          <input 
-            type="text" 
-            name="name" 
-            placeholder="Name" 
-            value={formData.name} 
-            onChange={handleChange}
-            className={errors.name ? "input-error" : ""}
-          />
-          {errors.name && <span className="error-message">{errors.name}</span>}
-        </div>
-        
-        <div className="input-group">
-          <input 
-            type="number" 
-            name="age" 
-            placeholder="Age" 
-            value={formData.age} 
-            onChange={handleChange}
-            className={errors.age ? "input-error" : ""}
-          />
-          {errors.age && <span className="error-message">{errors.age}</span>}
-        </div>
-        
-        <div className="input-group">
-          <input 
-            type="email" 
-            name="email" 
-            placeholder="Email" 
-            value={formData.email} 
-            onChange={handleChange}
-            className={errors.email ? "input-error" : ""}
-          />
-          {errors.email && <span className="error-message">{errors.email}</span>}
+        {/* Input Grid - 4 Columns in Single Row */}
+        <div className="grid grid-cols-4 gap-4 w-full">
+          <div className="input-group">
+            <input 
+              type="text" 
+              name="name" 
+              placeholder="Name" 
+              value={formData.name} 
+              onChange={handleChange}
+              className={errors.name ? "input-error" : ""}
+            />
+            {errors.name && <span className="error-message">{errors.name}</span>}
+          </div>
+          
+          <div className="input-group">
+            <input 
+              type="number" 
+              name="age" 
+              placeholder="Age" 
+              value={formData.age} 
+              onChange={handleChange}
+              className={errors.age ? "input-error" : ""}
+            />
+            {errors.age && <span className="error-message">{errors.age}</span>}
+          </div>
+          
+          <div className="input-group">
+            <input 
+              type="email" 
+              name="email" 
+              placeholder="Email" 
+              value={formData.email} 
+              onChange={handleChange}
+              className={errors.email ? "input-error" : ""}
+            />
+            {errors.email && <span className="error-message">{errors.email}</span>}
+          </div>
+
+          <div className="input-group">
+            <input
+              type="text" 
+              name="city" 
+              placeholder="City"
+              value={formData.city} 
+              onChange={handleChange}
+              className={errors.city ? "input-error" : ""}
+            />
+            {errors.city && <span className="error-message">{errors.city}</span>}
+          </div>
         </div>
 
-        <div className="input-group">
-          <input
-            type="text" 
-            name="city" 
-            placeholder="City"
-            value={formData.city} 
-            onChange={handleChange}
-            className={errors.city ? "input-error" : ""}
-          />
-          {errors.city && <span className="error-message">{errors.city}</span>}
-        </div>
-
+        {/* File Upload - Full Width */}
         <div className="file-upload-group">
           <label className="file-upload-label">📸 Profile Picture</label>
           <input 
@@ -164,7 +168,8 @@ function UserForm({ showToast, onUserAdded }) {
           />
         </div>
 
-        <button type="submit" className="btn-primary" disabled={loading}>
+
+        <button type="submit" className="btn-primary w-full" disabled={loading}>
           {loading ? "⏳ Saving..." : "✨ Add User"}
         </button>
 

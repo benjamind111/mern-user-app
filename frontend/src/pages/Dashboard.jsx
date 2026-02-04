@@ -167,18 +167,15 @@ const Dashboard = ({ showToast }) => {
   const topCities = getTopCities();
 
   return (
-    <div className="page-container">
+    <div className="w-full min-w-full pl-6 pt-6 pb-6 space-y-8">
       {/* Page Header */}
-      <div className="page-header mb-8">
-        <div>
-          <h1 className="page-title text-3xl font-bold text-white">Dashboard</h1>
-          <p className="page-subtitle text-slate-400 mt-2">Overview of your user management system</p>
-        </div>
+      <div>
+        <h1 className="text-4xl font-bold text-white mb-2">Dashboard</h1>
+        <p className="text-slate-400">Overview of your user management system</p>
       </div>
 
-      {/* Stats Cards - Using Inline StatsCard Component */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Total Users */}
+      {/* Stats Cards - 3 Column Grid - Full Width */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
         <StatsCard
           title="Total Users"
           value={stats.total}
@@ -187,7 +184,6 @@ const Dashboard = ({ showToast }) => {
           trend={null}
         />
 
-        {/* Active Users */}
         <StatsCard
           title="Active Users"
           value={stats.active}
@@ -197,7 +193,6 @@ const Dashboard = ({ showToast }) => {
           showPulse={stats.active > 0}
         />
 
-        {/* Pending Users */}
         <StatsCard
           title="Pending Users"
           value={stats.pending}
@@ -207,25 +202,25 @@ const Dashboard = ({ showToast }) => {
         />
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Charts Section - 2 Column Grid - Full Width */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
         {/* Pie Chart - Status Distribution */}
-        <div className="bg-[#1e293b] border border-slate-700 rounded-xl p-6">
-          <div className="mb-6">
+        <div className="bg-[#1e293b] border border-slate-700 rounded-xl p-6 h-[450px] flex flex-col w-full">
+          <div className="mb-4">
             <h3 className="text-xl font-bold text-white">User Status Distribution</h3>
             <p className="text-slate-400 text-sm mt-1">Breakdown by current status</p>
           </div>
-          <div className="chart-container">
+          <div className="flex-1 min-h-0 w-full h-full">
             {statusData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={statusData}
                     cx="50%"
-                    cy="50%"
+                    cy="45%"
                     labelLine={false}
                     label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={100}
+                    outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -234,11 +229,11 @@ const Dashboard = ({ showToast }) => {
                     ))}
                   </Pie>
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend />
+                  <Legend verticalAlign="bottom" height={36} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[300px]">
+              <div className="flex items-center justify-center h-full">
                 <p className="text-slate-500">No user data available</p>
               </div>
             )}
@@ -246,17 +241,21 @@ const Dashboard = ({ showToast }) => {
         </div>
 
         {/* Bar Chart - Top Cities */}
-        <div className="bg-[#1e293b] border border-slate-700 rounded-xl p-6">
-          <div className="mb-6">
+        <div className="bg-[#1e293b] border border-slate-700 rounded-xl p-6 h-[450px] flex flex-col w-full">
+          <div className="mb-4">
             <h3 className="text-xl font-bold text-white">Top Cities</h3>
             <p className="text-slate-400 text-sm mt-1">Users by location (Top 5)</p>
           </div>
-          <div className="chart-container">
+          <div className="flex-1 min-h-0 w-full h-full">
             {topCities.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={topCities}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={topCities} margin={{ bottom: 70 }}>
                   <XAxis 
                     dataKey="city" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={70}
+                    interval={0}
                     stroke="#94a3b8"
                     tick={{ fill: '#94a3b8' }}
                   />
@@ -269,11 +268,12 @@ const Dashboard = ({ showToast }) => {
                     dataKey="count" 
                     fill="#4f46e5"
                     radius={[8, 8, 0, 0]}
+                    barSize={40}
                   />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[300px]">
+              <div className="flex items-center justify-center h-full">
                 <p className="text-slate-500">No city data available</p>
               </div>
             )}
