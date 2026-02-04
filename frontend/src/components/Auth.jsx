@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LogIn, UserPlus, Mail, Lock, Loader, AlertCircle } from 'lucide-react';
+import { API_URL } from '../config/api';
 
 const Auth = ({ onLogin, showToast }) => {
   const [email, setEmail] = useState("");
@@ -44,7 +45,7 @@ const Auth = ({ onLogin, showToast }) => {
     setErrors({});
 
     const endpoint = isRegistering ? "register" : "login";
-    const URL = `https://mern-user-app-ir5o.onrender.com/api/auth/${endpoint}`;
+    const URL = `${API_URL}/api/auth/${endpoint}`;
 
     try {
       const response = await fetch(URL, {

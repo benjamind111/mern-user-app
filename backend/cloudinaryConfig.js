@@ -2,11 +2,11 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
 
-// 1. Configure Cloudinary with your keys
+// 1. Configure Cloudinary with environment variables (SECURE)
 cloudinary.config({
-  cloud_name: 'dg1nod3lc',
-  api_key: '671853212198249',
-  api_secret: 'kLbox80Xvd7FXUkaPa2xjHib5u0'
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 // 2. Configure Storage (Where to put the files)

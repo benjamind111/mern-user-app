@@ -5,6 +5,7 @@ import StatusBadge from "./StatusBadge";
 import DropdownMenu from "./DropdownMenu";
 import EditUserModal from "./EditUserModal";
 import UserProfileModal from "./UserProfileModal";
+import { API_URL } from '../config/api';
 
 // Generate random status for users
 const getRandomStatus = () => {
@@ -32,7 +33,7 @@ function UserList({ showToast, viewMode = 'grid', filterRole = 'all' }) {
   // Fetch users (READ)
   const fetchUsers = () => {
     setLoading(true);
-    fetch("https://mern-user-app-ir5o.onrender.com/api/users")
+    fetch(`${API_URL}/api/users`)
       .then((res) => res.json())
       .then((data) => {
         // Add random status to each user
@@ -58,7 +59,7 @@ function UserList({ showToast, viewMode = 'grid', filterRole = 'all' }) {
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this user?")) {
       try {
-        await fetch(`https://mern-user-app-ir5o.onrender.com/api/users/${id}`, { method: "DELETE" });
+        await fetch(`${API_URL}/api/users/${id}`, { method: "DELETE" });
         setUsers(users.filter((user) => user._id !== id));
         showToast?.("User deleted successfully", "success");
       } catch (error) {
